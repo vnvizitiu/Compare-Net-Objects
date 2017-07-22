@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 
-#if !PORTABLE && !NEWPCL
+#if !PORTABLE && !DNCORE
 using System.Data;
 using System.Drawing;
 #endif
@@ -27,7 +27,7 @@ namespace KellermanSoftware.CompareNetObjects
             if (!IsIList(type))
                 return false;
 
-#if !NEWPCL
+#if !DNCORE
             var fullName = type.UnderlyingSystemType.FullName;
 #else
             var fullName = type.FullName;
@@ -84,7 +84,11 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+            return type.IsValueType && !IsSimpleType(type);
+#else
             return type.GetTypeInfo().IsValueType && !IsSimpleType(type);
+#endif
         }
 
         /// <summary>
@@ -110,7 +114,11 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+            return type.IsClass;
+#else
             return type.GetTypeInfo().IsClass;
+#endif
         }
 
         /// <summary>
@@ -123,7 +131,11 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+            return type.IsInterface;
+#else
             return type.GetTypeInfo().IsInterface;
+#endif
         }
 
         /// <summary>
@@ -162,7 +174,11 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+             return type.IsEnum;
+#else
             return type.GetTypeInfo().IsEnum;
+#endif
         }
 
         /// <summary>
@@ -188,8 +204,13 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+            return type.IsGenericType
+                && type.GetGenericTypeDefinition() == typeof(HashSet<>);
+#else
             return type.GetTypeInfo().IsGenericType
                 && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(HashSet<>);
+#endif
         }
 
         /// <summary>
@@ -214,7 +235,7 @@ namespace KellermanSoftware.CompareNetObjects
         {
             if (type == null)
                 return false;
-#if !NEWPCL
+#if !DNCORE
             var toCheck = type.ReflectedType;
 #else
             var toCheck = type.DeclaringType;
@@ -283,6 +304,19 @@ namespace KellermanSoftware.CompareNetObjects
             if (type == null)
                 return false;
 
+#if PORTABLE
+                        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                type = Nullable.GetUnderlyingType(type);
+            }
+
+            return type.IsPrimitive
+                   || type.IsEnum
+                   || type == typeof(DateTime)
+                   || type == typeof(decimal)
+                   || type == typeof(string)
+                   || type == typeof(Guid);
+#else
             if (type.GetTypeInfo().IsGenericType && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = Nullable.GetUnderlyingType(type);
@@ -293,6 +327,7 @@ namespace KellermanSoftware.CompareNetObjects
                    || type == typeof(decimal)
                    || type == typeof(string)
                    || type == typeof(Guid);
+#endif
 
         }
 
@@ -309,7 +344,7 @@ namespace KellermanSoftware.CompareNetObjects
             return (typeof(Type).IsAssignableFrom(type));
         }
 
-#if !PORTABLE && !NEWPCL
+#if !PORTABLE && !DNCORE
         /// <summary>
         /// Returns true if the type is an IPEndPoint
         /// </summary>
@@ -373,9 +408,18 @@ namespace KellermanSoftware.CompareNetObjects
 
             return type == typeof(Font);
         }
+
+        public static bool IsDataColumn(Type type)
+        {
+            if (type == null)
+                return false;
+
+            return type == typeof(DataColumn);
+        }
 #endif
 
 
 
     }
 }
+

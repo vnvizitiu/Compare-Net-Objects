@@ -8,7 +8,7 @@ namespace KellermanSoftware.CompareNetObjects
     /// <summary>
     /// Exclude types depending upon the configuration
     /// </summary>
-    internal static class ExcludeLogic 
+    public static class ExcludeLogic 
     {
         /// <summary>
         /// Returns true if the property or field should be excluded
@@ -20,6 +20,12 @@ namespace KellermanSoftware.CompareNetObjects
         {
             //Only compare specific field names
             if (config.MembersToInclude.Count > 0 && !config.MembersToInclude.Contains(info.Name))
+                return true;
+
+            //Ignore by type.propertyname
+            if (config.MembersToIgnore.Count > 0
+                && info.DeclaringType != null
+                && config.MembersToIgnore.Contains(info.DeclaringType.Name + "." + info.Name))
                 return true;
 
             //If we should ignore it, skip it
@@ -58,8 +64,13 @@ namespace KellermanSoftware.CompareNetObjects
             }
 
             //The class is ignored by an attribute
+#if PORTABLE
+            if (IgnoredByAttribute(config, t1))
+                return true;
+#else
             if (IgnoredByAttribute(config, t1.GetTypeInfo()))
                 return true;
+#endif
 
             return false;
         }

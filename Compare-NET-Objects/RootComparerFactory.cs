@@ -36,18 +36,19 @@ namespace KellermanSoftware.CompareNetObjects
             _rootComparer.TypeComparers = new List<BaseTypeComparer>();
 
             _rootComparer.TypeComparers.Add(new RuntimeTypeComparer(_rootComparer));
-#if !PORTABLE && !NEWPCL
+#if !PORTABLE && !DNCORE
             _rootComparer.TypeComparers.Add(new FontComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new IpEndPointComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new DatasetComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new DataTableComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new DataRowComparer(_rootComparer));
+            _rootComparer.TypeComparers.Add(new DataColumnComparer(_rootComparer));
 #endif
             _rootComparer.TypeComparers.Add(new EnumerableComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new ByteArrayComparer(_rootComparer));
+            _rootComparer.TypeComparers.Add(new DictionaryComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new ListComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new HashSetComparer(_rootComparer));
-            _rootComparer.TypeComparers.Add(new DictionaryComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new EnumComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new PointerComparer(_rootComparer));
             _rootComparer.TypeComparers.Add(new UriComparer(_rootComparer));

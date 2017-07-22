@@ -24,7 +24,7 @@ namespace KellermanSoftware.CompareNetObjects.Reports
         /// </summary>
         public string ChangedToText { get; set; }
 
-#if !PORTABLE && !NEWPCL
+#if !PORTABLE && !DNCORE
         /// <summary>
         /// Output the differences to a file
         /// </summary>
@@ -32,6 +32,9 @@ namespace KellermanSoftware.CompareNetObjects.Reports
         /// <param name="filePath">The file path</param>
         public void OutputFile(List<Difference> differences, string filePath)
         {
+            if (String.IsNullOrEmpty(Path.GetDirectoryName(filePath)))
+                filePath = Path.Combine(FileHelper.GetCurrentDirectory(), filePath);
+
             using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 using (TextWriter writer = new StreamWriter(fileStream))
@@ -95,7 +98,7 @@ namespace KellermanSoftware.CompareNetObjects.Reports
             return sb.ToString();
         }
 
-        #if !PORTABLE && !NEWPCL
+        #if !PORTABLE && !DNCORE
         /// <summary>
         /// Launch the application for showing the file
         /// </summary>

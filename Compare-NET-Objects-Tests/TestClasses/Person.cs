@@ -7,6 +7,8 @@ namespace KellermanSoftware.CompareNetObjectsTests.TestClasses
     [Serializable]
     public class Person : IName
     {
+        public int ID { get; set; }
+
         public DateTime DateCreated;
 
         public string Name
